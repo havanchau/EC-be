@@ -1,12 +1,11 @@
 import { AuthService } from './auth.service';
-import { Auth } from './auth.schema';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
     register(body: {
         username: string;
         password: string;
-    }): Promise<Auth>;
+    }): Promise<any>;
     login(body: {
         username: string;
         password: string;

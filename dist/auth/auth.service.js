@@ -19,6 +19,7 @@ const mongoose_2 = require("mongoose");
 const auth_schema_1 = require("./auth.schema");
 const bcrypt = require("bcrypt");
 const jwt_1 = require("@nestjs/jwt");
+const jwt = require("jsonwebtoken");
 let AuthService = class AuthService {
     constructor(authModel, jwtService) {
         this.authModel = authModel;
@@ -27,15 +28,25 @@ let AuthService = class AuthService {
     async register(username, password) {
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new this.authModel({ username, password: hashedPassword });
-        return newUser.save();
+        const savedUser = await newUser.save();
+        const user = savedUser.toObject();
+        delete user.password;
+        const token = this.generateToken(user._id);
+        return { user, token };
     }
     async login(username, password) {
         const user = await this.authModel.findOne({ username });
-        if (user && await bcrypt.compare(password, user.password)) {
-            const accessToken = this.jwtService.sign({ username: user.username, sub: user._id });
+        if (user && (await bcrypt.compare(password, user.password))) {
+            const accessToken = this.jwtService.sign({
+                username: user.username,
+                sub: user._id,
+            });
             return { accessToken };
         }
         return null;
+    }
+    generateToken(userId) {
+        return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
     }
 };
 exports.AuthService = AuthService;
