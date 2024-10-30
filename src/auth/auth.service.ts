@@ -22,7 +22,7 @@ export class AuthService {
     delete user.password;
     
     // Generate JWT token
-    const token: string = this.generateToken(user._id);
+    const token: string = this.generateToken(user._id as string);
 
     return { user, token };
   }
