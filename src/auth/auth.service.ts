@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 import { Auth, AuthDocument } from './auth.schema';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
@@ -23,7 +22,7 @@ export class AuthService {
     delete user.password;
     
     // Generate JWT token
-    const token = this.generateToken(user._id);
+    const token: string = this.generateToken(user._id);
 
     return { user, token };
   }
