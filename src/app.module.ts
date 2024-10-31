@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { ImageModule } from './3rd/cloudinary/image.module';
 import { UserModule } from './user/user.module';
 import { ProductModule } from './product/product.module';
 
@@ -15,7 +14,6 @@ import { ProductModule } from './product/product.module';
     }),
     MongooseModule.forRoot(process.env.DB_CONNECTION_STRING),
     AuthModule,
-    ImageModule,
     UserModule,
     ProductModule,
   ],
