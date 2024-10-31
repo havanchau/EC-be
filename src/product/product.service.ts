@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductDocument } from './product.schema';
-import { ImageService } from 'src/3rd/cloudinary/image.service';
+import { ImageService } from 'src/cloudinary/image.service';
 
 @Injectable()
 export class ProductService {
