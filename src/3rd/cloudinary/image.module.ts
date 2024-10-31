@@ -6,7 +6,7 @@ import { Image, ImageSchema } from './image.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Image.name, schema: ImageSchema }]), // Adjust if you're using TypeORM
+    MongooseModule.forFeature([{ name: Image.name, schema: ImageSchema }]),
   ],
   controllers: [ImageController],
   providers: [ImageService],

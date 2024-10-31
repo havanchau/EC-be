@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 // import { Feedback } from '../feedback/feedback.schema';
-// import { Image } from '../image/image.schema';
 
 export type ProductDocument = Product & Document;
 
@@ -40,8 +39,8 @@ export class Product {
 //   @Prop({ type: [Feedback] })
 //   feedbacks: Feedback[];
 
-//   @Prop({ type: [Image] })
-//   images: Image[];
+  @Prop()
+  images: string[];
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

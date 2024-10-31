@@ -2,14 +2,22 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductDocument } from './product.schema';
+import { ImageService } from 'src/3rd/cloudinary/image.service';
 
 @Injectable()
 export class ProductService {
-  constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>) {}
+  constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>, private imageService: ImageService) {}
 
-  async create(productData: Partial<Product>): Promise<Product> {
-    const createdProduct = new this.productModel(productData);
-    return createdProduct.save();
+  async create(productData: Partial<Product>, images: Express.Multer.File[]): Promise<Product> {
+    for (const file of images) {
+      const result = await this.imageService.uploadImage(file)
+      productData.images.push(result.secure_url);
+    }
+
+    const product = new this.productModel(productData);
+    const savedProduct = await product.save();
+
+    return savedProduct;
   }
 
   async findAll(): Promise<Product[]> {

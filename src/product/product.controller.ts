@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFiles } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { Product } from './product.schema';
@@ -12,8 +12,8 @@ export class ProductController {
   @ApiOperation({ summary: 'Create a new product' })
   @ApiBody({ type: Product })
   @ApiResponse({ status: 201, description: 'Product created successfully.', type: Product })
-  async create(@Body() productData: Partial<Product>): Promise<Product> {
-    return this.productService.create(productData);
+  async create(@Body() productData: Partial<Product>, @UploadedFiles() images: Express.Multer.File[]): Promise<Product> {
+    return this.productService.create(productData, images);
   }
 
   @Get()
