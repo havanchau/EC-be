@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFiles, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { Product } from './product.schema';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import multer from 'multer';
 
 @ApiTags('products')
 @Controller('products')
@@ -11,8 +13,11 @@ export class ProductController {
   @Post()
   @ApiOperation({ summary: 'Create a new product' })
   @ApiBody({ type: Product })
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 10 }]))
   @ApiResponse({ status: 201, description: 'Product created successfully.', type: Product })
-  async create(@Body() productData: Partial<Product>, @UploadedFiles() images: Express.Multer.File[]): Promise<Product> {
+  async create(@Body() productData: Partial<Product>, @UploadedFiles() files: { images?: Express.Multer.File[] }): Promise<Product> {
+    const images = Array.isArray(files.images) ? files.images : [files.images];
+    console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     return this.productService.create(productData, images);
   }
 
