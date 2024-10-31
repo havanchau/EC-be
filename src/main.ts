@@ -1,21 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as dotenv from 'dotenv';
+import * as serverless from 'serverless-http';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-	dotenv.config();
-	const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule);
 
-	const config = new DocumentBuilder()
-		.setTitle('Auth API')
-		.setDescription('The auth API description')
-		.setVersion('1.0')
-		.build();
+    const config = new DocumentBuilder()
+        .setTitle('Auth API')
+        .setDescription('The auth API description')
+        .setVersion('1.0')
+        .build();
 
-	const document = SwaggerModule.createDocument(app, config);
-	SwaggerModule.setup('api', app, document);
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document);
 
-  	await app.listen(process.env.PORT ?? 3001);
+    await app.init();
+
+    return serverless(app.getHttpAdapter().getInstance());
 }
-bootstrap();
+
+export const handler = bootstrap();
