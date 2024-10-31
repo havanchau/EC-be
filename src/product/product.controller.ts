@@ -17,7 +17,6 @@ export class ProductController {
   @ApiResponse({ status: 201, description: 'Product created successfully.', type: Product })
   async create(@Body() productData: Partial<Product>, @UploadedFiles() files: { images?: Express.Multer.File[] }): Promise<Product> {
     const images = Array.isArray(files.images) ? files.images : [files.images];
-    console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     return this.productService.create(productData, images);
   }
 

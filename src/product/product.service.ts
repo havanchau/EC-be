@@ -9,16 +9,11 @@ export class ProductService {
   constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>, private imageService: ImageService) {}
 
   async create(productData: Partial<Product>, images: Express.Multer.File[]): Promise<Product> {
-    console.log('bbbbbbbbbbbbbbbbbbbbbbbbbbb');
-    
     productData.images = [];
     for (const file of images) {
       const result = await this.imageService.uploadImage(file)
       productData.images.push(result.secure_url);
     }
-
-    console.log('ccccccccccccccccccccccccccc');
-    
 
     const product = new this.productModel(productData);
     const savedProduct = await product.save();
