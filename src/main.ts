@@ -8,10 +8,10 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
-    .setTitle('BKon backend API document')
-    .setDescription('The BKon API description')
+    .setTitle('EC backend API document')
+    .setDescription('The EC API description')
     .setVersion('1.0')
-    .addTag('BKon')
+    .addTag('EC')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
