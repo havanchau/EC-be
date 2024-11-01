@@ -6,17 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ProductModule } from './product/product.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { ImageModule } from './cloudinary/image.module';
-import { v2 as cloudinary } from 'cloudinary';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 @Module({
   imports: [
@@ -28,15 +19,9 @@ cloudinary.config({
     UserModule,
     ProductModule,
     ImageModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: 'CLOUDINARY',
-      useValue: cloudinary,
-    },
-  ],
-  exports: ['CLOUDINARY'],
+  providers: [AppService],
 })
 export class AppModule {}

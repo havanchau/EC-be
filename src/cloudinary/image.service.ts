@@ -1,19 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { UploadApiResponse, UploadApiErrorResponse, v2 as Cloudinary } from 'cloudinary';
 
 @Injectable()
 export class ImageService {
-  constructor(@Inject('CLOUDINARY') private cloudinary) {}
+  constructor(@Inject('CLOUDINARY') private readonly cloudinary: typeof Cloudinary) {}
 
-  async uploadImage(file: Express.Multer.File): Promise<any> {
+  async uploadImage(file: Express.Multer.File): Promise<UploadApiResponse | UploadApiErrorResponse> {
     return new Promise((resolve, reject) => {
-      this.cloudinary.uploader
-        .upload_stream((error, result) => {
-          if (error) {
-            return reject(error);
-          }
-          resolve(result);
-        })
-        .end(file.buffer);
+      this.cloudinary.uploader.upload_stream((error, result) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(result);
+      }).end(file.buffer);
     });
   }
 }
