@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFiles, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { Product } from './product.schema';
-import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
-import multer from 'multer';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { PartialType } from '@nestjs/mapped-types';
 
 @ApiTags('products')
 @Controller('products')
@@ -12,10 +12,13 @@ export class ProductController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new product' })
-  @ApiBody({ type: Product })
+  @ApiBody({ description: 'Data for creating a new product', type: Product })
   @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 10 }]))
   @ApiResponse({ status: 201, description: 'Product created successfully.', type: Product })
-  async create(@Body() productData: Partial<Product>, @UploadedFiles() files: { images?: Express.Multer.File[] }): Promise<Product> {
+  async create(
+    @Body() productData: Partial<Product>,
+    @UploadedFiles() files: { images?: Express.Multer.File[] }
+  ): Promise<Product> {
     const images = Array.isArray(files.images) ? files.images : [files.images];
     return this.productService.create(productData, images);
   }
@@ -37,7 +40,7 @@ export class ProductController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a product by ID' })
-  @ApiBody({ type: Product })
+  @ApiBody({ description: 'Updated data for the product', type: PartialType(Product) })
   @ApiResponse({ status: 200, description: 'Product updated successfully.', type: Product })
   @ApiResponse({ status: 404, description: 'Product not found.' })
   async update(@Param('id') id: string, @Body() productData: Partial<Product>): Promise<Product> {
