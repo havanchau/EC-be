@@ -10,6 +10,7 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { ImageModule } from './modules/cloudinary/image.module';
 import { JwtModule } from '@nestjs/jwt';
 import { OrderModule } from './modules/order/order.module';
+import { ReviewModule } from './modules/review/review.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { OrderModule } from './modules/order/order.module';
     ImageModule,
     CloudinaryModule,
     OrderModule,
+    ReviewModule,
   ],
   controllers: [AppController],
   providers: [AppService],
