@@ -40,6 +40,6 @@ export class UserService {
   }
 
   private generateToken(userId: string): string {
-    return this.jwtService.sign({ userId }, { expiresIn: '1h' });
+    return this.jwtService.sign({ userId });
   }
 }
