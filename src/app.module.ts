@@ -11,6 +11,8 @@ import { ImageModule } from './modules/cloudinary/image.module';
 import { JwtModule } from '@nestjs/jwt';
 import { OrderModule } from './modules/order/order.module';
 import { ReviewModule } from './modules/review/review.module';
+import { AuthGuard } from './common/guards/auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -31,6 +33,12 @@ import { ReviewModule } from './modules/review/review.module';
     ReviewModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}

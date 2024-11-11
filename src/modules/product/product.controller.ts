@@ -4,6 +4,7 @@ import { ProductService } from './product.service';
 import { Product } from './product.schema';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { PartialType } from '@nestjs/mapped-types';
+import { Public } from 'src/decorators/public.decorator';
 
 @ApiTags('products')
 @Controller('products')
@@ -24,6 +25,7 @@ export class ProductController {
   }
 
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({ status: 200, description: 'List of products.', type: [Product] })
   async findAll(): Promise<Product[]> {
