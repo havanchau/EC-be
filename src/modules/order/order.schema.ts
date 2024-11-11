@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Item } from 'src/interface/item';
+import { Item } from '../../interface/item';
 
 export type OrderDocument = Order & Document;
 
