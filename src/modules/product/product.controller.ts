@@ -4,7 +4,7 @@ import { ProductService } from './product.service';
 import { Product } from './product.schema';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { PartialType } from '@nestjs/mapped-types';
-import { Public } from 'src/decorators/public.decorator';
+import { Public } from '../../decorators/public.decorator';
 
 @ApiTags('products')
 @Controller('products')
