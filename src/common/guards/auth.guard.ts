@@ -1,6 +1,7 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../decorators/public.decorator';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -15,12 +16,20 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    // Place your authentication logic here. Example:
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization;
-    if (!token) return false;
+    const token = request.headers.authorization?.split(' ')[1];
 
-    // Add token validation logic here
-    return true; // Only return true if authenticated
+    if (!token) {
+      throw new UnauthorizedException('Token not provided');
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+      request.user = decoded;
+      return true;
+    } catch (error) {
+      console.error('Token validation error:', error);
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 }

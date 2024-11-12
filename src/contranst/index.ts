@@ -1,0 +1,1 @@
+export const DOMAIN = process.env.ENV === 'prod' ? 'http://localhost:3000/' : 'http://localhost:3000/'
