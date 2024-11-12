@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import PayOS from "@payos/node";
+import PayOS = require("@payos/node");
 
 @Injectable()
 export class PayOSService {
@@ -19,7 +19,7 @@ export class PayOSService {
 
     const paymentLink = await this.payos.createPaymentLink({
       amount: amount,
-      description: "Thanh toan phi mua hang",
+      description: 'Thanh toan phi mua hang',
       orderCode: orderCode,
       returnUrl: `${this.configService.get<string>('DOMAIN')}/result`,
       cancelUrl: `${this.configService.get<string>('DOMAIN')}/result`,
