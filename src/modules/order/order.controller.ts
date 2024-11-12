@@ -12,7 +12,7 @@ export class OrderController {
   @ApiBody({ description: 'Order data', type: Order })
   @ApiResponse({ status: 201, description: 'Order successfully created.' })
   @Post()
-  async createOrder(@Body() orderData: Partial<Order>): Promise<Order> {
+  async createOrder(@Body() orderData: Partial<Order>): Promise<any> {
     return this.orderService.createOrder(orderData);
   }
 
