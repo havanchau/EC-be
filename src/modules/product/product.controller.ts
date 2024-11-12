@@ -32,6 +32,7 @@ export class ProductController {
     return this.productService.findAll();
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get a product by ID' })
   @ApiResponse({ status: 200, description: 'Product found.', type: Product })
