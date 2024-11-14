@@ -21,9 +21,50 @@ export class ProductService {
     return savedProduct;
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.productModel.find().exec();
+  async findAll(query: { 
+    name?: string; 
+    category?: string; 
+    minPrice?: number; 
+    maxPrice?: number; 
+    brand?: string; 
+    rating?: number;
+    desc?: string;
+    benefit?: string;
+  }): Promise<Product[]> {
+    const { name, category, minPrice, maxPrice, brand, rating, desc, benefit } = query;
+  
+    const filter: any = {};
+  
+    if (name) {
+      filter.name = { $regex: name, $options: 'i' };
+    }
+    if (category) {
+      filter.category = category;
+    }
+    if (minPrice !== undefined) {
+      filter.price = { ...filter.price, $gte: minPrice };
+    }
+    if (maxPrice !== undefined) {
+      filter.price = { ...filter.price, $lte: maxPrice };
+    }
+    if (brand) {
+      filter.brand = brand;
+    }
+    if (rating !== undefined) {
+      filter.rating = { $gte: rating };
+    }
+
+    if (desc) {
+      filter.desc = { $regex: desc, $options: 'i' };
+    }
+
+    if (benefit) {
+      filter.benefit = { $regex: benefit, $options: 'i' };
+    }
+  
+    return await this.productModel.find(filter);
   }
+  
 
   async findOne(id: string): Promise<Product> {
     const product = await this.productModel.findById(id).exec();

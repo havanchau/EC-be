@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFiles, UseInterceptors } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFiles, UseInterceptors, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { Product } from './product.schema';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -28,8 +28,25 @@ export class ProductController {
   @Public()
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({ status: 200, description: 'List of products.', type: [Product] })
-  async findAll(): Promise<Product[]> {
-    return this.productService.findAll();
+  @ApiQuery({ name: 'name', required: false, description: 'Filter by product name' })
+  @ApiQuery({ name: 'category', required: false, description: 'Filter by product category' })
+  @ApiQuery({ name: 'minPrice', required: false, description: 'Minimum price' })
+  @ApiQuery({ name: 'maxPrice', required: false, description: 'Maximum price' })
+  @ApiQuery({ name: 'brand', required: false, description: 'Filter by product brand' })
+  @ApiQuery({ name: 'rating', required: false, description: 'Minimum rating' })
+  @ApiQuery({ name: 'desc', required: false, description: 'Desc of product' })
+  @ApiQuery({ name: 'benefit', required: false, description: 'Benefit of product' })
+  async findAll(
+    @Query('name') name?: string,
+    @Query('category') category?: string,
+    @Query('minPrice') minPrice?: number,
+    @Query('maxPrice') maxPrice?: number,
+    @Query('brand') brand?: string,
+    @Query('rating') rating?: number,
+    @Query('desc') desc?: string,
+    @Query('benefit') benefit?: string,
+  ): Promise<Product[]> {
+    return this.productService.findAll({ name, category, minPrice, maxPrice, brand, rating, desc, benefit });
   }
 
   @Public()
