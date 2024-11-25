@@ -4,6 +4,13 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export type UserDocument = User & Document;
 
+// Định nghĩa Enum cho role
+export enum UserRole {
+  ADMIN = 'admin',
+  CUSTOMER = 'customer',
+  SALER = 'saler',
+}
+
 @Schema()
 export class User {
   @ApiProperty({ description: 'The username of the user', example: 'john_doe', maxLength: 100 })
@@ -41,6 +48,15 @@ export class User {
   @ApiProperty({ description: 'The date when the user was last updated', example: '2024-10-31T08:00:00.000Z', default: Date.now })
   @Prop({ type: Date, default: Date.now })
   updatedAt: Date;
+
+  @ApiProperty({
+    description: 'The role of the user',
+    example: UserRole.CUSTOMER,
+    enum: UserRole,
+    default: UserRole.CUSTOMER,
+  })
+  @Prop({ type: String, enum: UserRole, default: UserRole.CUSTOMER })
+  role: UserRole;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

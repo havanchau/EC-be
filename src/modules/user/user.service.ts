@@ -27,14 +27,14 @@ export class UserService {
     return { user, token };
   }
 
-  async login(loginUserDto: LoginUserDto): Promise<{ accessToken: string } | null> {
+  async login(loginUserDto: LoginUserDto): Promise<{ accessToken: string, user: User } | null> {
     const user = await this.userModel.findOne({ username: loginUserDto.username });
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
       const accessToken = this.jwtService.sign({
         username: user.username,
         sub: user._id,
       });
-      return { accessToken };
+      return { user, accessToken };
     }
     return null;
   }
