@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { relative } from 'node:path/posix';
 
 @Injectable()
 export class UserService {
@@ -16,6 +17,15 @@ export class UserService {
 
   async register(createUserDto: CreateUserDto): Promise<{ user: User; token: string }> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const existingUser = await this.userModel.findOne({
+      $or: [
+        { username: createUserDto.username },
+        { email: createUserDto.email },
+      ],
+    }).select('_id');
+    if (existingUser) {
+      return null;
+    }
     const newUser = new this.userModel({ ...createUserDto, password: hashedPassword });
     const savedUser = await newUser.save();
     
@@ -35,6 +45,7 @@ export class UserService {
         sub: user._id,
       });
       delete user.password;
+      console.log(user);
       return { user, accessToken };
     }
     return null;
