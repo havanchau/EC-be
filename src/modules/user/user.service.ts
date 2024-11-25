@@ -34,6 +34,7 @@ export class UserService {
         username: user.username,
         sub: user._id,
       });
+      delete user.password;
       return { user, accessToken };
     }
     return null;
