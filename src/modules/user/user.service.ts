@@ -15,20 +15,27 @@ export class UserService {
     private jwtService: JwtService,
   ) {}
 
-  async register(createUserDto: CreateUserDto): Promise<{ user: User; token: string }> {
+  async register(
+    createUserDto: CreateUserDto,
+  ): Promise<{ user: User; token: string }> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const existingUser = await this.userModel.findOne({
-      $or: [
-        { username: createUserDto.username },
-        { email: createUserDto.email },
-      ],
-    }).select('_id');
+    const existingUser = await this.userModel
+      .findOne({
+        $or: [
+          { username: createUserDto.username },
+          { email: createUserDto.email },
+        ],
+      })
+      .select('_id');
     if (existingUser) {
       return null;
     }
-    const newUser = new this.userModel({ ...createUserDto, password: hashedPassword });
+    const newUser = new this.userModel({
+      ...createUserDto,
+      password: hashedPassword,
+    });
     const savedUser = await newUser.save();
-    
+
     const user = savedUser.toObject();
     delete user.password;
 
@@ -37,21 +44,47 @@ export class UserService {
     return { user, token };
   }
 
-  async login(loginUserDto: LoginUserDto): Promise<{ accessToken: string, user: User } | null> {
-    const user = await this.userModel.findOne({ username: loginUserDto.username });
+  async login(
+    loginUserDto: LoginUserDto,
+  ): Promise<{ accessToken: string; user: User } | null> {
+    const user = await this.userModel.findOne({
+      username: loginUserDto.username,
+    });
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
-      const accessToken = this.jwtService.sign({
-        username: user.username,
-        sub: user._id,
-      });
-      delete user.password;
+      const jwtSecret = process.env.JWT_SECRET;
+
+      if (!jwtSecret) {
+        throw new Error(
+          'JWT_SECRET is not defined in the environment variables',
+        );
+      }
+
+      const accessToken = this.jwtService.sign(
+        {
+          username: user.username,
+          sub: user._id,
+        },
+        { secret: jwtSecret },
+      );
+      user.password = null;
       console.log(user);
       return { user, accessToken };
     }
     return null;
   }
 
+  async find(username: string): Promise<User | null> {
+    return this.userModel.findOne({ username }).exec();
+  }  
+
+  async gets(): Promise<User[] | null> {
+    return this.userModel.find().exec();
+  }
+
   private generateToken(userId: string): string {
-    return this.jwtService.sign({ userId });
+    const payload = { userId };
+    const secret = process.env.JWT_SECRET;
+    const options = { expiresIn: '1h' };
+    return this.jwtService.sign(payload, { ...options, secret });
   }
 }

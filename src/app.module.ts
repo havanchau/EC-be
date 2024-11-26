@@ -13,6 +13,7 @@ import { OrderModule } from './modules/order/order.module';
 import { ReviewModule } from './modules/review/review.module';
 import { AuthGuard } from './common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './common/guards/roles.guard';
 
 @Module({
   imports: [
@@ -38,6 +39,10 @@ import { APP_GUARD } from '@nestjs/core';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

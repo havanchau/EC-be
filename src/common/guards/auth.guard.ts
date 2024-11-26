@@ -1,6 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from '../../decorators/public.decorator';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
@@ -8,7 +7,8 @@ export class AuthGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    const request = context.switchToHttp().getRequest();
+    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -16,9 +16,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization?.split(' ')[1];
-
     if (!token) {
       throw new UnauthorizedException('Token not provided');
     }

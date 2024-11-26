@@ -1,9 +1,11 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Public } from 'src/decorators/public.decorator';
 import { CreateUserDto } from 'src/modules/user/dto/create-user.dto';
 import { LoginUserDto } from 'src/modules/user/dto/login-user.dto';
 import { UserService } from 'src/modules/user/user.service';
+import { User } from '../user/user.schema';
+import { Role } from 'src/decorators/roles.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -52,5 +54,11 @@ export class AuthController {
       username: body.username,
       password: body.password,
     } as LoginUserDto);
+  }
+
+  @Get('')
+  @Role('admin')
+  async gets(): Promise<User[] | null> {
+    return this.userService.gets();
   }
 }
