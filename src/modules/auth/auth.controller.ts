@@ -5,7 +5,7 @@ import { CreateUserDto } from 'src/modules/user/dto/create-user.dto';
 import { LoginUserDto } from 'src/modules/user/dto/login-user.dto';
 import { UserService } from 'src/modules/user/user.service';
 import { User } from '../user/user.schema';
-import { Role } from 'src/decorators/roles.decorator';
+import { Role } from '../../decorators/roles.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
