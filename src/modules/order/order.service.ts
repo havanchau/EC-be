@@ -68,7 +68,7 @@ export class OrderService {
 
   async getOrders(userId: string): Promise<Order[]> {
     return this.orderModel
-      .find()
+      .find({ userId: userId })
       .populate('userId')
       .populate('items.productId')
       .exec();
