@@ -10,8 +10,8 @@ import { CreateOrderDto } from './dto/create-order.dto';
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
-    private paymentService: PayOSService,
-    private productService: ProductService,
+    private readonly paymentService: PayOSService,
+    private readonly productService: ProductService,
   ) {}
 
   async createOrder(

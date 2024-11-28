@@ -5,11 +5,12 @@ import { OrderController } from './order.controller';
 import { Order, OrderSchema } from './order.schema';
 import { PayOSService } from '../payos/payos.service';
 import { ProductModule } from '../product/product.module';
+import { ProductService } from '../product/product.service';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
-    ProductModule,
+    ProductModule
   ],
   controllers: [OrderController],
   providers: [OrderService, PayOSService],
