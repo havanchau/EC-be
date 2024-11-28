@@ -22,13 +22,12 @@ export class UserService {
     const existingUser = await this.userModel
       .findOne({
         $or: [
-          { username: createUserDto.username },
-          { email: createUserDto.email },
+          { username: { $eq: createUserDto.username } },
+          { email: { $eq: createUserDto.email } },
         ],
-      })
-      .select('_id');
+      });
     if (existingUser) {
-      return null;
+      throw new Error('User with this username already exists');
     }
     const newUser = new this.userModel({
       ...createUserDto,
@@ -47,9 +46,12 @@ export class UserService {
   async login(
     loginUserDto: LoginUserDto,
   ): Promise<{ accessToken: string; user: any } | null> {
-    const user = await this.userModel.findOne({
-      username: loginUserDto.username,
-    }).exec();
+    const user = await this.userModel
+      .findOne({
+        username: loginUserDto.username,
+      })
+      .exec();
+    console.log(loginUserDto);
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
       const jwtSecret = process.env.JWT_SECRET;
 
@@ -69,7 +71,7 @@ export class UserService {
       const { password, ...res } = user.toObject();
       return { user: res, accessToken };
     }
-    return null;
+    throw new Error('Invalid information');
   }
 
   async find(username: string): Promise<User | null> {
