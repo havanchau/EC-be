@@ -37,6 +37,19 @@ export class Order {
   })
   status: string;
 
+  @ApiProperty({
+    type: String,
+    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+    default: 'Pending',
+    description: 'Current status of the order',
+  })
+  @Prop({
+    type: String,
+    enum: ['Pending', 'Paied', 'Cancelled'],
+    default: 'Pending',
+  })
+  paymentStatus: string;
+
   @Prop({
     type: String,
     default: null,
