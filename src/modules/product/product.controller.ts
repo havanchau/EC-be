@@ -1,3 +1,4 @@
+import { Role } from './../../decorators/roles.decorator';
 import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFiles, UseInterceptors, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { ProductService } from './product.service';
@@ -12,6 +13,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
+  @Role('admin', 'saler')
   @ApiOperation({ summary: 'Create a new product' })
   @ApiBody({ description: 'Data for creating a new product', type: Product })
   @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 10 }]))
@@ -59,6 +61,7 @@ export class ProductController {
   }
 
   @Patch(':id')
+  @Role('admin', 'saler')
   @ApiOperation({ summary: 'Update a product by ID' })
   @ApiBody({ description: 'Updated data for the product', type: PartialType(Product) })
   @ApiResponse({ status: 200, description: 'Product updated successfully.', type: Product })
@@ -70,6 +73,7 @@ export class ProductController {
   }
 
   @Delete(':id')
+  @Role('admin')
   @ApiOperation({ summary: 'Delete a product by ID' })
   @ApiResponse({ status: 200, description: 'Product deleted successfully.', type: Product })
   @ApiResponse({ status: 404, description: 'Product not found.' })
