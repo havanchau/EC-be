@@ -3,10 +3,8 @@ import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody } from '@nestjs/s
 import { OrderService } from './order.service';
 import { Order } from './order.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { User } from '../user/user.schema';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { CurrentUser } from 'src/decorators/userdata.decorator';
-import { Public } from 'src/decorators/public.decorator';
+import { AuthGuard } from '../../common/guards/auth.guard';
+import { CurrentUser } from '../../decorators/userdata.decorator';
 
 @ApiTags('orders')
 @UseGuards(AuthGuard)
