@@ -1,26 +1,32 @@
-import { Controller, Get, Post, Param, Patch, Body, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Param, Patch, Body, NotFoundException, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { OrderService } from './order.service';
 import { Order } from './order.schema';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { User } from '../user/user.schema';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { CurrentUser } from 'src/decorators/userdata.decorator';
+import { Public } from 'src/decorators/public.decorator';
 
 @ApiTags('orders')
+@UseGuards(AuthGuard)
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @ApiOperation({ summary: 'Create a new order' })
-  @ApiBody({ description: 'Order data', type: Order })
+  @ApiBody({ description: 'Order data', type: CreateOrderDto })
   @ApiResponse({ status: 201, description: 'Order successfully created.' })
   @Post()
-  async createOrder(@Body() orderData: Partial<Order>): Promise<any> {
-    return this.orderService.createOrder(orderData);
+  async createOrder(@CurrentUser() user: any, @Body() orderData: CreateOrderDto): Promise<any> {
+    return this.orderService.createOrder(orderData, user.sub);
   }
 
   @ApiOperation({ summary: 'Get all orders' })
   @ApiResponse({ status: 200, description: 'Retrieved all orders.' })
   @Get()
-  async getOrders(): Promise<Order[]> {
-    return this.orderService.getOrders();
+  async getOrders(@CurrentUser() user: any): Promise<Order[]> {
+    return this.orderService.getOrders(user.sub);
   }
 
   @ApiOperation({ summary: 'Get an order by ID' })

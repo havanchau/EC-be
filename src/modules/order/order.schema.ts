@@ -8,8 +8,8 @@ export type OrderDocument = Order & Document;
 @Schema({ timestamps: true })
 export class Order {
   @ApiProperty({ type: String, description: 'User ID', required: true })
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  userId: Types.ObjectId;
+  @Prop({ type: String })
+  userId: string;
 
   @ApiProperty({
     type: [Item],
@@ -17,7 +17,7 @@ export class Order {
   })
   @Prop([
     {
-      productId: { type: Types.ObjectId, ref: 'Product', required: true },
+      productId: { type: String, required: true },
       quantity: { type: Number, required: true, min: 1 },
       price: { type: Number, required: true },
     },
@@ -37,6 +37,12 @@ export class Order {
   })
   status: string;
 
+  @Prop({
+    type: String,
+    default: null,
+  })
+  paymentInfo: string;
+
   @ApiProperty({
     type: String,
     enum: ['Credit Card', 'PayPal', 'Cash on Delivery'],
@@ -49,7 +55,11 @@ export class Order {
   })
   paymentMethod: string;
 
-  @ApiProperty({ type: Number, description: 'Total amount of the order', required: true })
+  @ApiProperty({
+    type: Number,
+    description: 'Total amount of the order',
+    required: true,
+  })
   @Prop({ required: true })
   totalAmount: number;
 
