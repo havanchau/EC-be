@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import PayOS = require('@payos/node');
-import { DOMAIN } from 'src/contranst';
+import { DOMAIN } from '../../contranst';
 
 @Injectable()
 export class PayOSService {
