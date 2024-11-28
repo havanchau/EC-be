@@ -36,15 +36,5 @@ export class OrderController {
     return this.orderService.getOrderById(id);
   }
 
-  @ApiOperation({ summary: 'Update an order status' })
-  @ApiParam({ name: 'id', description: 'Order ID' })
-  @ApiBody({ description: 'Order status', schema: { type: 'string' } })
-  @ApiResponse({ status: 200, description: 'Order status updated.' })
-  @Patch(':id/status')
-  async updateOrderStatus(
-    @Param('id') id: string,
-    @Body('status') status: string,
-  ): Promise<Order> {
-    return this.orderService.updateOrderStatus(id, status);
-  }
+  
 }

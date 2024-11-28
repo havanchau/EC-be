@@ -62,5 +62,9 @@ export class VoucherService {
   async getActiveVouchers(): Promise<Voucher[]> {
     return this.voucherModel.find({ isActive: true }).sort({ createdAt: -1 });
   }
+
+  async get(code: string): Promise<Voucher> {
+    return this.voucherModel.findOne({ isActive: true, code: code }).sort({ createdAt: -1 });
+  }
   
 }

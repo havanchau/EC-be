@@ -52,7 +52,7 @@ class ItemDto {
   price: number;
 }
 
-export class CreateOrderDto {
+export class UpdateOrderDto {
   @ApiProperty({
     type: [ItemDto],
     description: 'List of items in the order',
@@ -99,11 +99,4 @@ export class CreateOrderDto {
   })
   @IsDateString()
   deliveryDate: string;
-
-  @ApiProperty({
-    description: 'Voucher code',
-    example: '123456789',
-  })
-  @IsString()
-  voucherCode?: string;
 }

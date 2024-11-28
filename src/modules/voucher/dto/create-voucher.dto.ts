@@ -28,6 +28,14 @@ export class CreateVoucherDto {
   maxUsage: number;
 
   @ApiProperty({
+    description: 'Current usage of the voucher',
+    example: 100,
+    required: true,
+  })
+  @IsNumber()
+  currentUsage: number;
+
+  @ApiProperty({
     description: 'Discount percentage of the voucher (0 - 100)',
     example: 20,
     required: true,
