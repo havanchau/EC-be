@@ -46,10 +46,10 @@ export class UserService {
 
   async login(
     loginUserDto: LoginUserDto,
-  ): Promise<{ accessToken: string; user: User } | null> {
+  ): Promise<{ accessToken: string; user: any } | null> {
     const user = await this.userModel.findOne({
       username: loginUserDto.username,
-    });
+    }).exec();
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
       const jwtSecret = process.env.JWT_SECRET;
 
@@ -66,19 +66,18 @@ export class UserService {
         },
         { secret: jwtSecret },
       );
-      user.password = null;
-      console.log(user);
-      return { user, accessToken };
+      const { password, ...res } = user.toObject();
+      return { user: res, accessToken };
     }
     return null;
   }
 
   async find(username: string): Promise<User | null> {
-    return this.userModel.findOne({ username }).exec();
-  }  
+    return this.userModel.findOne({ username }).select('-password').exec();
+  }
 
   async gets(): Promise<User[] | null> {
-    return this.userModel.find().exec();
+    return this.userModel.find().select('-password').exec();
   }
 
   private generateToken(userId: string): string {

@@ -74,7 +74,7 @@ export class ProductService {
     return product;
   }
 
-  async update(id: string, productData: Partial<Product>, images: Express.Multer.File[]): Promise<Product> {
+  async update(id: string, productData: Partial<Product>, images: Express.Multer.File[] | null = null): Promise<Product> {
     const newImages = [];
     for (const file of images) {
       const result = await this.imageService.uploadImage(file)

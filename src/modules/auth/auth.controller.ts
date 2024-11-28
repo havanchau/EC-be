@@ -49,7 +49,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 200, description: 'User logged in successfully.', type: String })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  async login(@Body() body: { username: string; password: string }): Promise<{ accessToken: string } | null> {
+  async login(@Body() body: { username: string; password: string }): Promise<{ accessToken: string, user: any } | null> {
     return this.userService.login({
       username: body.username,
       password: body.password,
