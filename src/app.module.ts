@@ -14,6 +14,8 @@ import { ReviewModule } from './modules/review/review.module';
 import { AuthGuard } from './common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guards/roles.guard';
+import { CartModule } from './modules/cart/cart.module';
+import { VoucherModule } from './modules/voucher/voucher.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { RolesGuard } from './common/guards/roles.guard';
     CloudinaryModule,
     OrderModule,
     ReviewModule,
+    CartModule,
+    VoucherModule,
   ],
   controllers: [AppController],
   providers: [

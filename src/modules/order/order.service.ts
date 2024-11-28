@@ -1,3 +1,4 @@
+import { VoucherService } from './../voucher/voucher.service';
 import { ProductService } from './../product/product.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,18 +13,34 @@ export class OrderService {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     private readonly paymentService: PayOSService,
     private readonly productService: ProductService,
+    private readonly voucherService: VoucherService,
   ) {}
 
   async createOrder(
     orderData: Partial<CreateOrderDto>,
     userId: string,
   ): Promise<any> {
+    
+    const { voucherCode, ...orderInfo } = orderData;
+    
+    const voucher = await this.voucherService.get(voucherCode);
+
+    const res = await this.voucherService.applyVoucher(voucherCode);
+
+    if (!res) {
+      throw new Error('Voucher invalid');
+    }
+
     const totalAmount = orderData.items.reduce((acc, item) => {
       return acc + item.price * item.quantity;
     }, 0);
 
+    const discountPrice =  totalAmount * voucher.discount < voucher.maxDiscountPrice ? totalAmount * voucher.discount : voucher.maxDiscountPrice;
+
+    const price = totalAmount - discountPrice;
+
     const order = {
-      ...orderData,
+      ...orderInfo,
       userId,
       orderDate: new Date(),
       totalAmount,
@@ -56,7 +73,7 @@ export class OrderService {
 
     const paymentInfo = await this.paymentService.createPayment(
       result._id as string,
-      totalAmount,
+      price,
     );
 
     result.paymentInfo = JSON.stringify(paymentInfo);
