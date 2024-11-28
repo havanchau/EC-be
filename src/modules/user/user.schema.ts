@@ -4,7 +4,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export type UserDocument = User & Document;
 
-// Định nghĩa Enum cho role
 export enum UserRole {
   ADMIN = 'admin',
   CUSTOMER = 'customer',

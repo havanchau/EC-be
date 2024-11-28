@@ -74,7 +74,13 @@ export class ProductService {
     return product;
   }
 
-  async update(id: string, productData: Partial<Product>): Promise<Product> {
+  async update(id: string, productData: Partial<Product>, images: Express.Multer.File[]): Promise<Product> {
+    const newImages = [];
+    for (const file of images) {
+      const result = await this.imageService.uploadImage(file)
+      newImages.push(result.secure_url);
+    }
+    productData.images = [...productData.images, ...newImages];
     const updatedProduct = await this.productModel.findByIdAndUpdate(id, productData, { new: true }).exec();
     if (!updatedProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);

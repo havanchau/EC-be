@@ -63,8 +63,10 @@ export class ProductController {
   @ApiBody({ description: 'Updated data for the product', type: PartialType(Product) })
   @ApiResponse({ status: 200, description: 'Product updated successfully.', type: Product })
   @ApiResponse({ status: 404, description: 'Product not found.' })
-  async update(@Param('id') id: string, @Body() productData: Partial<Product>): Promise<Product> {
-    return this.productService.update(id, productData);
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 10 }]))
+  async update(@Param('id') id: string, @Body() productData: Partial<Product>, @UploadedFiles() files: { images?: Express.Multer.File[] }): Promise<Product> {
+    const images = Array.isArray(files.images) ? files.images : [files.images];
+    return this.productService.update(id, productData, images);
   }
 
   @Delete(':id')
