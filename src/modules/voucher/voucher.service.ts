@@ -11,11 +11,15 @@ export class VoucherService {
     @InjectConnection() private readonly connection: Connection,
   ) { }
 
-  async createVoucher(voucherData: CreateVoucherDto
+  async createVoucher(vouchersData: CreateVoucherDto[]
 
-  ): Promise<Voucher> {
-    const newVoucher = new this.voucherModel(voucherData);
-    return newVoucher.save();
+  ): Promise<Voucher[]> {
+    const results = []
+    vouchersData.map(async (item) => {
+      const newVoucher = new this.voucherModel(item);
+      results.push(await newVoucher.save())
+    })
+    return results;
   }
 
   async applyVoucher(

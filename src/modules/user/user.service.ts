@@ -51,7 +51,6 @@ export class UserService {
         username: loginUserDto.username,
       })
       .exec();
-    console.log(loginUserDto);
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
       const jwtSecret = process.env.JWT_SECRET;
 

@@ -3,15 +3,25 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductDocument } from './product.schema';
 import { ImageService } from 'src/modules/cloudinary/image.service';
+import { ReviewService } from '../review/review.service';
+import { Review } from '../review/review.schema';
 
 @Injectable()
 export class ProductService {
-  constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>, private imageService: ImageService) {}
+  constructor(
+    @InjectModel(Product.name)
+    private readonly productModel: Model<ProductDocument>,
+    private readonly imageService: ImageService,
+    private readonly reviewService: ReviewService,
+  ) {}
 
-  async create(productData: Partial<Product>, images: Express.Multer.File[]): Promise<Product> {
+  async create(
+    productData: Partial<Product>,
+    images: Express.Multer.File[],
+  ): Promise<Product> {
     productData.images = [];
     for (const file of images) {
-      const result = await this.imageService.uploadImage(file)
+      const result = await this.imageService.uploadImage(file);
       productData.images.push(result.secure_url);
     }
 
@@ -21,20 +31,21 @@ export class ProductService {
     return savedProduct;
   }
 
-  async findAll(query: { 
-    name?: string; 
-    category?: string; 
-    minPrice?: number; 
-    maxPrice?: number; 
-    brand?: string; 
+  async findAll(query: {
+    name?: string;
+    category?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    brand?: string;
     rating?: number;
     desc?: string;
     benefit?: string;
   }): Promise<Product[]> {
-    const { name, category, minPrice, maxPrice, brand, rating, desc, benefit } = query;
-  
+    const { name, category, minPrice, maxPrice, brand, rating, desc, benefit } =
+      query;
+
     const filter: any = {};
-  
+
     if (name) {
       filter.name = { $regex: name, $options: 'i' };
     }
@@ -61,27 +72,37 @@ export class ProductService {
     if (benefit) {
       filter.benefit = { $regex: benefit, $options: 'i' };
     }
-  
+
     return await this.productModel.find(filter);
   }
-  
 
-  async findOne(id: string): Promise<Product> {
+  async findOne(id: string): Promise<{ product: Product; feedbacks: Review[] }> {
     const product = await this.productModel.findById(id).exec();
+  
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    return product;
+  
+    const feedbacks = await this.reviewService.getReviewsByProduct(id);
+  
+    return { product, feedbacks };
   }
+  
 
-  async update(id: string, productData: Partial<Product>, images: Express.Multer.File[] | null = null): Promise<Product> {
+  async update(
+    id: string,
+    productData: Partial<Product>,
+    images: Express.Multer.File[] | null = null,
+  ): Promise<Product> {
     const newImages = [];
     for (const file of images) {
-      const result = await this.imageService.uploadImage(file)
+      const result = await this.imageService.uploadImage(file);
       newImages.push(result.secure_url);
     }
     productData.images = [...productData.images, ...newImages];
-    const updatedProduct = await this.productModel.findByIdAndUpdate(id, productData, { new: true }).exec();
+    const updatedProduct = await this.productModel
+      .findByIdAndUpdate(id, productData, { new: true })
+      .exec();
     if (!updatedProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }

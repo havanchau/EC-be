@@ -14,6 +14,10 @@ export class Product {
   @Prop({ required: true })
   price: number;
 
+  @ApiProperty({ description: 'The original price of the product', example: 25.99 })
+  @Prop({ required: true })
+  originalPrice: number;
+
   @ApiProperty({ description: 'A description of the product', example: 'Organic shampoo with natural ingredients' })
   @Prop()
   desc: string;
@@ -45,11 +49,6 @@ export class Product {
   @ApiProperty({ description: 'Whether the product is deleted or not', example: false, default: false })
   @Prop({ default: false })
   isDel: boolean;
-
-  // Uncomment if needed
-  // @ApiProperty({ description: 'Feedbacks for the product', type: [Feedback] })
-  // @Prop({ type: [Feedback] })
-  // feedbacks: Feedback[];
 
   @ApiProperty({ description: 'URLs of images for the product', example: ['http://example.com/image1.jpg'] })
   @Prop()

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Delete, Param, Body } from '@nestjs/commo
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 import { ReviewService } from './review.service';
 import { Review } from './review.schema';
+import { CurrentUser } from 'src/decorators/userdata.decorator';
 
 @ApiTags('Reviews')
 @Controller('reviews')
@@ -12,7 +13,12 @@ export class ReviewController {
   @ApiOperation({ summary: 'Create a review' })
   @ApiBody({ type: Review })
   async createReview(@Body() reviewData: Partial<Review>): Promise<Review> {
-    return this.reviewService.createReview(reviewData);
+    try {
+      return this.reviewService.createReview(reviewData);
+    }
+    catch (err) {
+      return err.message;
+    }
   }
 
   @Get(':productId')
@@ -24,8 +30,8 @@ export class ReviewController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a review' })
-  async updateReview(@Param('id') id: string, @Body() reviewData: Partial<Review>): Promise<Review> {
-    return this.reviewService.updateReview(id, reviewData);
+  async updateReview(@CurrentUser() user: any, @Param('id') id: string, @Body() reviewData: Partial<Review>): Promise<Review> {
+    return this.reviewService.updateReview(id, reviewData, user.sub);
   }
 
   @Delete(':id')
