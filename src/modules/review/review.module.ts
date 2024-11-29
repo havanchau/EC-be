@@ -8,7 +8,7 @@ import { ProductModule } from '../product/product.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Review.name, schema: ReviewSchema }]),
-    forwardRef(() => ReviewModule)
+    forwardRef(() => ProductModule)
   ],
   controllers: [ReviewController],
   providers: [ReviewService],
