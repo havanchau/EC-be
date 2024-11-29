@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Review, ReviewDocument } from './review.schema';
@@ -17,7 +17,10 @@ export class ReviewService {
     const product = this.productService.findOne(reviewData.productId);
 
     if (!product) {
-      throw new Error('Product with productId not exist!');
+      throw new HttpException(
+        'Product with productId not exist!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const review = new this.reviewModel(reviewData);

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import PayOS = require('@payos/node');
 import { DOMAIN } from '../../contranst';
@@ -37,15 +37,20 @@ export class PayOSService {
 
   async getPaymentInfo(code: string): Promise<any> {
     if (!code) {
-      throw new Error('Invalid payment code');
+      throw new HttpException(
+        'Invalid payment code',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     try {
       const paymentInfo = await this.payos.getPaymentLinkInformation(code);
       return paymentInfo;
     } catch (error) {
-      console.error('Error fetching payment information:', error);
-      throw new Error('Failed to fetch payment information');
+      throw new HttpException(
+        'Error fetching payment information:' + error,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

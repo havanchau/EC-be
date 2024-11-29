@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './user.schema';
@@ -6,28 +6,28 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { relative } from 'node:path/posix';
+import { sendEmail } from '../mail/mail.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    private jwtService: JwtService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async register(
-    createUserDto: CreateUserDto,
-  ): Promise<{ user: User; token: string }> {
+  async register(createUserDto: CreateUserDto): Promise<any> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const existingUser = await this.userModel
-      .findOne({
-        $or: [
-          { username: { $eq: createUserDto.username } },
-          { email: { $eq: createUserDto.email } },
-        ],
-      });
+    const existingUser = await this.userModel.findOne({
+      $or: [
+        { username: { $eq: createUserDto.username } },
+        { email: { $eq: createUserDto.email } },
+      ],
+    });
     if (existingUser) {
-      throw new Error('User with this username already exists');
+      throw new HttpException(
+        'User with this username already exists',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const newUser = new this.userModel({
       ...createUserDto,
@@ -36,11 +36,18 @@ export class UserService {
     const savedUser = await newUser.save();
 
     const user = savedUser.toObject();
-    delete user.password;
+    const { password, ...res } = user;
 
     const token = this.generateToken(user._id as string);
 
-    return { user, token };
+    const verificationUrl = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
+    await sendEmail(
+      createUserDto.email,
+      'Verify your email',
+      `Click the link to verify your email: ${verificationUrl}`,
+    );
+
+    return res;
   }
 
   async login(
@@ -49,14 +56,16 @@ export class UserService {
     const user = await this.userModel
       .findOne({
         username: loginUserDto.username,
+        isVerified: true,
       })
       .exec();
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
       const jwtSecret = process.env.JWT_SECRET;
 
       if (!jwtSecret) {
-        throw new Error(
+        throw new HttpException(
           'JWT_SECRET is not defined in the environment variables',
+          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -70,21 +79,63 @@ export class UserService {
       const { password, ...res } = user.toObject();
       return { user: res, accessToken };
     }
-    throw new Error('Invalid information');
+    throw new HttpException(
+      'Invalid information or User not verified',
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
   async find(username: string): Promise<User | null> {
-    return this.userModel.findOne({ username }).select('-password').exec();
+    return this.userModel
+      .findOne({ username, isVerified: true })
+      .select('-password')
+      .exec();
   }
 
   async gets(): Promise<User[] | null> {
-    return this.userModel.find().select('-password').exec();
+    return this.userModel.find({ isVerified: true }).select('-password').exec();
   }
 
   private generateToken(userId: string): string {
     const payload = { userId };
     const secret = process.env.JWT_SECRET;
-    const options = { expiresIn: '1h' };
+    const options = { expiresIn: '30d' };
     return this.jwtService.sign(payload, { ...options, secret });
+  }
+
+  async verifyEmail(token: string): Promise<{ message: string }> {
+    try {
+      const jwtSecret = process.env.JWT_SECRET;
+
+      if (!jwtSecret) {
+        throw new HttpException(
+          'JWT_SECRET is not defined in the environment variables',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const payload = this.jwtService.verify(token, { secret: jwtSecret });
+      const userId = payload.userId;
+
+      const user = await this.userModel.findOne({
+        _id: userId,
+        isVerified: false,
+      });
+
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      }
+
+      if (user.isVerified) {
+        return { message: 'User is already verified' };
+      }
+
+      user.isVerified = true;
+      await user.save();
+
+      return { message: 'User verified successfully' };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { VoucherService } from './../voucher/voucher.service';
 import { ProductService } from './../product/product.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Order, OrderDocument } from './order.schema';
@@ -28,7 +28,10 @@ export class OrderService {
     const res = await this.voucherService.applyVoucher(voucherCode);
 
     if (!res) {
-      throw new Error('Voucher invalid');
+      throw new HttpException(
+        'Voucher invalid',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const totalAmount = orderData.items.reduce((acc, item) => {
@@ -51,7 +54,10 @@ export class OrderService {
         const product = await this.productService.findOne(item.productId);
 
         if (item.quantity > product.product.stock) {
-          throw new Error(`Don't have enough product`);
+          throw new HttpException(
+            `Don't have enough product`,
+            HttpStatus.BAD_REQUEST,
+          );
         }
 
         const newStock = product.product.stock - item.quantity;
@@ -61,7 +67,10 @@ export class OrderService {
         });
 
         if (!res) {
-          throw new Error('Updated product stock failed');
+          throw new HttpException(
+            'Updated product stock failed',
+            HttpStatus.BAD_REQUEST,
+          );
         }
       } catch (err) {
         return err;

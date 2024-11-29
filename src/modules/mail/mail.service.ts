@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const getEmailTemplate = (username: string) => `
+export const getEmailTemplate = (username: string) => `
 <h1>Xin chào ${username},</h1>
 
 <p>Chúng tôi rất vui mừng được thông báo rằng đơn hàng của bạn đã được xác nhận!</p>
@@ -29,14 +29,13 @@ const getEmailTemplate = (username: string) => `
 <p>Hotline: [Số hotline công ty]</p>
 `;
 
-export const sendEmail = async (to: string, subject: string, username: string) => {
+export const sendEmail = async (to: string, subject: string, text: string = null) => {
   try {
-    const html = getEmailTemplate(username);
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to,
       subject,
-      html,
+      text,
     };
 
     const info = await transporter.sendMail(mailOptions);
