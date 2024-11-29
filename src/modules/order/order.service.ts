@@ -50,11 +50,11 @@ export class OrderService {
       try {
         const product = await this.productService.findOne(item.productId);
 
-        if (item.quantity > product.stock) {
+        if (item.quantity > product.product.stock) {
           throw new Error(`Don't have enough product`);
         }
 
-        const newStock = product.stock - item.quantity;
+        const newStock = product.product.stock - item.quantity;
 
         const res = await this.productService.update(item.productId, {
           stock: newStock,
