@@ -4,11 +4,13 @@ import { Model } from 'mongoose';
 import { Cart, CartDocument } from './cart.schema';
 import { PayOSService } from '../payos/payos.service';
 import { CreateCartDto } from './dto/create-cart.dto';
+import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class CartService {
     constructor(
         @InjectModel(Cart.name) private cartModel: Model<CartDocument>,
+        private productService: ProductService,
     ) { }
 
     async createCart(
@@ -27,14 +29,43 @@ export class CartService {
         return { cart: result };
     }
 
-    async getCarts(userId: string): Promise<Cart[]> {
-        return this.cartModel
+    async getCarts(userId: string): Promise<any> {
+        const carts = await this.cartModel
             .find({ userId: userId })
             .populate('userId')
             .exec();
+
+        const results = [];
+
+        carts.map(async (cart) => {
+            const productIds = cart.items.map((item: any) => (item.productId as string));
+            const products = await this.productService.findAll({ productIds: productIds });
+    
+            const productMap = cart.items.map((item: any) => ({
+                productId: item.productId._id.toString(),
+                quantity: item.quantity,
+            }))
+
+            const updatedProducts = products.map((product: any) => {
+                const orderDetail = productMap.find((item: any) => item.productId === product._id.toString());
+                if (orderDetail) {
+                    return {
+                        ...product,
+                        quantity: orderDetail.quantity,
+                        totalPrice: orderDetail.quantity * product.price,
+                    };
+                }
+                return product;
+            });
+
+        })
+
+
+
+        return carts;
     }
 
-    async getCartById(id: string): Promise<Cart> {
+    async getCartById(id: string): Promise<any> {
         const cart = await this.cartModel
             .findById(id)
             .populate('userId')
@@ -42,6 +73,9 @@ export class CartService {
         if (!cart) {
             throw new NotFoundException(`Cart with ID ${id} not found`);
         }
+
+
+
         return cart;
     }
 

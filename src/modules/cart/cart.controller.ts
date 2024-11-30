@@ -23,7 +23,7 @@ export class CartController {
   @ApiOperation({ summary: 'Get all carts' })
   @ApiResponse({ status: 200, description: 'Retrieved all carts.' })
   @Get()
-  async getCarts(@CurrentUser() user: any): Promise<Cart[]> {
+  async getCarts(@CurrentUser() user: any): Promise<any> {
     return this.cartService.getCarts(user.sub);
   }
 

@@ -40,9 +40,11 @@ export class ProductService {
     rating?: number;
     desc?: string;
     benefit?: string;
-  }): Promise<Product[]> {
-    const { name, category, minPrice, maxPrice, brand, rating, desc, benefit } =
-      query;
+    productIds?: string[];
+    page?: number;
+    pageSize?: number;
+  }): Promise<any> {
+    const { name, category, minPrice, maxPrice, brand, rating, desc, benefit, productIds, page = 1, pageSize = 20 } = query;
 
     const filter: any = {};
 
@@ -73,7 +75,25 @@ export class ProductService {
       filter.benefit = { $regex: benefit, $options: 'i' };
     }
 
-    return await this.productModel.find(filter);
+    if (productIds) {
+      filter.productId = { $in: productIds };
+    }
+
+    const skip = (page - 1) * pageSize;
+    const limit = pageSize;
+
+    const results = await this.productModel.find(filter).skip(skip)
+      .limit(limit)
+      .exec();
+
+    const totalCount = await this.productModel.countDocuments(filter).exec();
+
+    return {
+      results,
+      totalCount,
+      totalPages: Math.ceil(totalCount / pageSize),
+      currentPage: page
+    };
   }
 
   async findOne(id: string): Promise<{ product: Product; feedbacks: Review[] }> {

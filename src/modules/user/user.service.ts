@@ -17,12 +17,15 @@ export class UserService {
 
   async register(createUserDto: CreateUserDto): Promise<any> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const existingUser = await this.userModel.findOne({
-      $or: [
-        { username: { $eq: createUserDto.username } },
-        { email: { $eq: createUserDto.email } },
-      ],
-    });
+    const existingUser = await this.userModel
+      .findOne({
+        $or: [
+          { username: { $eq: createUserDto.username } },
+          { email: { $eq: createUserDto.email } },
+        ],
+      });
+
+
     if (existingUser) {
       throw new HttpException(
         'User with this username already exists',
