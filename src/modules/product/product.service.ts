@@ -6,7 +6,7 @@ import { ImageService } from 'src/modules/cloudinary/image.service';
 
 @Injectable()
 export class ProductService {
-  constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>, private imageService: ImageService) {}
+  constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>, private imageService: ImageService) { }
 
   async create(productData: Partial<Product>, images: Express.Multer.File[]): Promise<Product> {
     productData.images = [];
@@ -21,20 +21,23 @@ export class ProductService {
     return savedProduct;
   }
 
-  async findAll(query: { 
-    name?: string; 
-    category?: string; 
-    minPrice?: number; 
-    maxPrice?: number; 
-    brand?: string; 
+  async findAll(query: {
+    name?: string;
+    category?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    brand?: string;
     rating?: number;
     desc?: string;
     benefit?: string;
-  }): Promise<Product[]> {
-    const { name, category, minPrice, maxPrice, brand, rating, desc, benefit } = query;
-  
+    productIds?: string[];
+    page?: number;
+    pageSize?: number;
+  }): Promise<any> {
+    const { name, category, minPrice, maxPrice, brand, rating, desc, benefit, productIds, page = 1, pageSize = 20 } = query;
+
     const filter: any = {};
-  
+
     if (name) {
       filter.name = { $regex: name, $options: 'i' };
     }
@@ -61,10 +64,28 @@ export class ProductService {
     if (benefit) {
       filter.benefit = { $regex: benefit, $options: 'i' };
     }
-  
-    return await this.productModel.find(filter);
+
+    if (productIds) {
+      filter.productId = { $in: productIds };
+    }
+
+    const skip = (page - 1) * pageSize;
+    const limit = pageSize;
+
+    const results = await this.productModel.find(filter).skip(skip)
+      .limit(limit)
+      .exec();
+
+    const totalCount = await this.productModel.countDocuments(filter).exec();
+
+    return {
+      results,
+      totalCount,
+      totalPages: Math.ceil(totalCount / pageSize),
+      currentPage: page
+    };
   }
-  
+
 
   async findOne(id: string): Promise<Product> {
     const product = await this.productModel.findById(id).exec();

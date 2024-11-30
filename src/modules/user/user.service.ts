@@ -26,6 +26,7 @@ export class UserService {
           { email: { $eq: createUserDto.email } },
         ],
       });
+
     if (existingUser) {
       throw new Error('User with this username already exists');
     }

@@ -47,7 +47,7 @@ export class ProductController {
     @Query('rating') rating?: number,
     @Query('desc') desc?: string,
     @Query('benefit') benefit?: string,
-  ): Promise<Product[]> {
+  ): Promise<any> {
     return this.productService.findAll({ name, category, minPrice, maxPrice, brand, rating, desc, benefit });
   }
 
