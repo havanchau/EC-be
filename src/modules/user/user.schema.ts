@@ -36,6 +36,10 @@ export class User {
   @Prop({ default: false })
   isDel: boolean;
 
+  @ApiProperty({ description: 'Check user verify', example: false, default: false })
+  @Prop({ default: false })
+  isVerified: boolean;
+
   @ApiProperty({ description: 'The refresh token for user session management', example: 'some_refresh_token', nullable: true })
   @Prop({ nullable: true })
   refreshToken: string;

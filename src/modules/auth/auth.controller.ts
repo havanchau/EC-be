@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Public } from 'src/decorators/public.decorator';
 import { CreateUserDto } from '../../modules/user/dto/create-user.dto';
@@ -56,7 +56,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async login(
     @Body() body: { username: string; password: string },
-  ): Promise<{ accessToken: string; user: any } | any> {
+  ): Promise<{ user: any } | any> {
     try {
       return this.userService.login({
         username: body.username,
@@ -71,5 +71,11 @@ export class AuthController {
   @Role('admin', 'saler')
   async gets(): Promise<User[] | null> {
     return this.userService.gets();
+  }
+
+  @Public()
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string): Promise<{ message: string }> {
+    return this.userService.verifyEmail(token);
   }
 }

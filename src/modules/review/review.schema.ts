@@ -7,12 +7,12 @@ export type ReviewDocument = Review & Document;
 @Schema({ timestamps: true })
 export class Review {
   @ApiProperty()
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  userId: Types.ObjectId;
+  @Prop({ type: String, required: true })
+  userId: string;
 
   @ApiProperty()
-  @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
-  productId: Types.ObjectId;
+  @Prop({ type: String, required: true })
+  productId: string;
 
   @ApiProperty({ description: 'Review rating between 1 and 5' })
   @Prop({ required: true, min: 1, max: 5 })
