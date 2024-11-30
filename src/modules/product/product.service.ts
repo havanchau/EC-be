@@ -112,14 +112,22 @@ export class ProductService {
   async update(
     id: string,
     productData: Partial<Product>,
-    images: Express.Multer.File[] | null = null,
+    imagesUpdate: Express.Multer.File[] | null = null,
   ): Promise<Product> {
     const newImages = [];
-    for (const file of images) {
-      const result = await this.imageService.uploadImage(file);
-      newImages.push(result.secure_url);
+
+    if (imagesUpdate) {
+      for (const file of imagesUpdate) {
+        const result = await this.imageService.uploadImage(file);
+        newImages.push(result.secure_url);
+      }
     }
-    productData.images = [...productData.images, ...newImages];
+
+    if (productData.images) {
+      const oldProductData = (await this.findOne(id)).product;
+    
+      productData.images = [...oldProductData.images, ...newImages];
+    }
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, productData, { new: true })
       .exec();

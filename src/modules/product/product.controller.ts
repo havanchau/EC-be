@@ -126,14 +126,14 @@ export class ProductController {
     type: Product,
   })
   @ApiResponse({ status: 404, description: 'Product not found.' })
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 10 }]))
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'imagesUpdate', maxCount: 10 }]))
   async update(
     @Param('id') id: string,
     @Body() productData: Partial<Product>,
-    @UploadedFiles() files: { images?: Express.Multer.File[] },
+    @UploadedFiles() files: { imagesUpdate?: Express.Multer.File[] },
   ): Promise<Product> {
-    const images = Array.isArray(files.images) ? files.images : [files.images];
-    return this.productService.update(id, productData, images);
+    const imagesUpdate = !files?.imagesUpdate ? null : Array.isArray(files?.imagesUpdate) ? files?.imagesUpdate : [files?.imagesUpdate];
+    return this.productService.update(id, productData, imagesUpdate);
   }
 
   @Delete(':id')
