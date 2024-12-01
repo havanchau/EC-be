@@ -40,13 +40,13 @@ export class CartService {
         carts.map(async (cart) => {
             const productIds = cart.items.map((item: any) => (item.productId as string));
             const products = await this.productService.findAll({ productIds: productIds });
-    
+
             const productMap = cart.items.map((item: any) => ({
                 productId: item.productId._id.toString(),
                 quantity: item.quantity,
             }))
 
-            const updatedProducts = products.map((product: any) => {
+            const productsInfo = products.map((product: any) => {
                 const orderDetail = productMap.find((item: any) => item.productId === product._id.toString());
                 if (orderDetail) {
                     return {
@@ -58,11 +58,14 @@ export class CartService {
                 return product;
             });
 
+
+            results.push({ cartInfo: cart, productInfo: productsInfo });
+
         })
 
 
 
-        return carts;
+        return results;
     }
 
     async getCartById(id: string): Promise<any> {
