@@ -13,9 +13,9 @@ class ItemDto {
   @IsNotEmpty()
   productId: string;
 
-  @ApiProperty({ description: 'Price per item', example: 29.99 })
+  @ApiProperty({ description: 'Quantity per item', example: 29.99 })
   @IsNotEmpty()
-  price: number;
+  quantity: number;
 }
 
 export class CreateCartDto {
