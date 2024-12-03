@@ -5,6 +5,7 @@ import { Cart } from './cart.schema';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { CurrentUser } from '../../decorators/userdata.decorator';
+import { User } from '../user/user.schema';
 
 @ApiTags('carts')
 @UseGuards(AuthGuard)
@@ -20,31 +21,13 @@ export class CartController {
     return this.cartService.createCart(cartData, user.sub);
   }
 
-  @ApiOperation({ summary: 'Get all carts' })
-  @ApiResponse({ status: 200, description: 'Retrieved all carts.' })
-  @Get()
-  async getCarts(@CurrentUser() user: any): Promise<any> {
-    return this.cartService.getCarts(user.sub);
-  }
-
   @ApiOperation({ summary: 'Get an cart by ID' })
   @ApiParam({ name: 'id', description: 'Cart ID' })
   @ApiResponse({ status: 200, description: 'Cart found.' })
   @ApiResponse({ status: 404, description: 'Cart not found.' })
-  @Get(':id')
-  async getCartById(@Param('id') id: string): Promise<Cart> {
-    return this.cartService.getCartById(id);
+  @Get()
+  async getCart(@CurrentUser() user: any): Promise<Cart> {
+    return this.cartService.getCart(user.sub);
   }
 
-  @ApiOperation({ summary: 'Update an cart' })
-  @ApiParam({ name: 'id', description: 'Cart ID' })
-  @ApiBody({ description: 'Cart status', schema: { type: 'string' } })
-  @ApiResponse({ status: 200, description: 'Cart status updated.' })
-  @Patch(':id')
-  async updateCartStatus(
-    @Param('id') id: string,
-    @Body() cartData: CreateCartDto,
-  ): Promise<Cart> {
-    return this.cartService.updateCart(id, cartData);
-  }
 }

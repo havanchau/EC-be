@@ -1,7 +1,6 @@
 import { Types } from 'mongoose';
 
 export class Item {
-  productId: Types.ObjectId;
+  productId: string;
   quantity: number;
-  price: number;
 }
