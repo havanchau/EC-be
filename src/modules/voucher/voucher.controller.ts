@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { Role } from 'src/decorators/roles.decorator';
 import { Public } from 'src/decorators/public.decorator';
@@ -15,6 +15,11 @@ export class VoucherController {
   @ApiOperation({ summary: 'Create a new voucher' })
   @ApiResponse({ status: 201, description: 'Voucher created successfully.' })
   @ApiResponse({ status: 400, description: 'Voucher code already exists.' })
+  @ApiBody({
+    description: 'Array of vouchers to be created',
+    isArray: true,
+    type: CreateVoucherDto,
+  })
   async createVoucher(
     @Body() vouchersData: CreateVoucherDto[],
   ) {
