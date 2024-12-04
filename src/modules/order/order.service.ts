@@ -6,7 +6,7 @@ import { Model } from 'mongoose';
 import { Order, OrderDocument } from './order.schema';
 import { PayOSService } from '../payos/payos.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { PaymentStatus } from 'src/enum';
+import { PaymentStatus } from '../../enum/index';
 
 @Injectable()
 export class OrderService {

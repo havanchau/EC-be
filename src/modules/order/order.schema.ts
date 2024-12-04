@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { OrderStatus, PaymentStatus, PaymentMethod } from 'src/enum';
+import { OrderStatus, PaymentStatus, PaymentMethod } from '../../enum/index';
 
 export type OrderDocument = Order & Document;
 
