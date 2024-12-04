@@ -1,4 +1,5 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Public } from 'src/decorators/public.decorator';
 import { CreateUserDto } from '../../modules/user/dto/create-user.dto';
@@ -75,7 +76,13 @@ export class AuthController {
 
   @Public()
   @Get('verify-email')
-  async verifyEmail(@Query('token') token: string): Promise<{ message: string }> {
-    return this.userService.verifyEmail(token);
+  async verifyEmail(@Query('token') token: string, @Res() res: Response,): Promise<any> {
+    const result = await this.userService.verifyEmail(token);
+
+    if (result.message === 'User verified successfully') {
+      res.redirect('/');
+    } else {
+      res.redirect('/error?message=' + encodeURIComponent(result.message));
+    }
   }
 }

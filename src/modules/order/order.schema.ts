@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Item } from '../../interface/item';
 
 export type OrderDocument = Order & Document;
 
@@ -12,7 +11,7 @@ export class Order {
   userId: string;
 
   @ApiProperty({
-    type: [Item],
+    type: Array,
     description: 'List of items in the order',
   })
   @Prop([
@@ -22,33 +21,37 @@ export class Order {
       price: { type: Number, required: true },
     },
   ])
-  items: Item[];
+  items: Array<{
+    productId: string;
+    quantity: number;
+    price: number;
+  }>;
 
   @ApiProperty({
     type: String,
-    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
-    default: 'Pending',
+    enum: OrderStatus,
+    default: OrderStatus.PENDING,
     description: 'Current status of the order',
   })
   @Prop({
     type: String,
-    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
-    default: 'Pending',
+    enum: Object.values(OrderStatus),
+    default: OrderStatus.PENDING,
   })
-  status: string;
+  status: OrderStatus;
 
   @ApiProperty({
     type: String,
-    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
-    default: 'Pending',
-    description: 'Current status of the order',
+    enum: PaymentStatus,
+    default: PaymentStatus.PENDING,
+    description: 'Payment status of the order',
   })
   @Prop({
     type: String,
-    enum: ['Pending', 'Paied', 'Cancelled'],
-    default: 'Pending',
+    enum: Object.values(PaymentStatus),
+    default: PaymentStatus.PENDING,
   })
-  paymentStatus: string;
+  paymentStatus: PaymentStatus;
 
   @Prop({
     type: String,
@@ -58,15 +61,15 @@ export class Order {
 
   @ApiProperty({
     type: String,
-    enum: ['Credit Card', 'PayPal', 'Cash on Delivery'],
+    enum: PaymentMethod,
     description: 'Payment method for the order',
   })
   @Prop({
     type: String,
-    enum: ['Credit Card', 'PayPal', 'Cash on Delivery'],
+    enum: Object.values(PaymentMethod),
     required: true,
   })
-  paymentMethod: string;
+  paymentMethod: PaymentMethod;
 
   @ApiProperty({
     type: Number,
@@ -78,13 +81,7 @@ export class Order {
 
   @ApiProperty({
     description: 'Shipping address of the order',
-    type: () => ({
-      street: { type: String, required: true },
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-      zipCode: { type: String, required: true },
-      country: { type: String, required: true },
-    }),
+    type: () => ({}),
   })
   @Prop({
     type: {

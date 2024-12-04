@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import PayOS = require('@payos/node');
-import { DOMAIN } from '../../contranst';
+import { FE_DOMAIN } from '../../contranst';
 
 @Injectable()
 export class PayOSService {
@@ -23,8 +23,8 @@ export class PayOSService {
         amount: Math.round(amount),
         description: 'Thanh toan phi mua hang',
         orderCode: orderCode,
-        returnUrl: `${DOMAIN}/order/${orderId}`,
-        cancelUrl: `${DOMAIN}/order/${orderId}`,
+        returnUrl: `${FE_DOMAIN}/order-result/${orderId}`,
+        cancelUrl: `${FE_DOMAIN}/order-result/${orderId}`,
       };
   
       const paymentLink = await this.payos.createPaymentLink(body);

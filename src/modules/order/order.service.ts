@@ -109,6 +109,21 @@ export class OrderService {
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
+
+    const paymentInfo = JSON.parse(order?.paymentInfo);
+    const orderCode = paymentInfo.orderCode;
+    const status = order.paymentStatus;
+
+    if (status === PaymentStatus.PENDING && orderCode) {
+      const paymentStatus = await this.paymentService.getPaymentInfo(orderCode);
+      const updateStatus = paymentStatus.data.status;
+
+      if (updateStatus === 'PAID') {
+        Object.assign(order, {...order, status: PaymentStatus.PAID})
+        await order.save();
+      }
+    }
+
     return order;
   }
 
