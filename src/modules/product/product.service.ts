@@ -76,7 +76,7 @@ export class ProductService {
     }
 
     if (productIds) {
-      filter.productId = { $in: productIds };
+      filter._id = { $in: productIds };
     }
 
     const skip = (page - 1) * pageSize;
