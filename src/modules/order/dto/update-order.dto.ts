@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsObject,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -71,11 +72,10 @@ export class UpdateOrderDto {
 
   @ApiProperty({
     description: 'Payment method',
-    enum: ['Credit Card', 'PayPal', 'Cash on Delivery'],
     example: 'Credit Card',
   })
-  @IsEnum(['Credit Card', 'PayPal', 'Cash on Delivery'])
-  paymentMethod: string;
+  @IsOptional()
+  paymentMethod?: string;
 
   @ApiProperty({
     description: 'Shipping address',

@@ -1,6 +1,11 @@
 import { VoucherService } from './../voucher/voucher.service';
 import { ProductService } from './../product/product.service';
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Order, OrderDocument } from './order.schema';
@@ -21,27 +26,30 @@ export class OrderService {
     orderData: Partial<CreateOrderDto>,
     userId: string,
   ): Promise<any> {
-    
     const { voucherCode, ...orderInfo } = orderData;
-    
-    const voucher = await this.voucherService.get(voucherCode);
 
-    const res = await this.voucherService.applyVoucher(voucherCode);
-
-    if (!res) {
-      throw new HttpException(
-        'Voucher invalid',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
 
     const totalAmount = orderData.items.reduce((acc, item) => {
       return acc + item.price * item.quantity;
     }, 0);
 
-    const discountPrice =  totalAmount * voucher.discount < voucher.maxDiscountPrice ? totalAmount * voucher.discount : voucher.maxDiscountPrice;
+    let price = totalAmount;
 
-    const price = totalAmount - discountPrice;
+    if (voucherCode) {
+      const voucher = await this.voucherService.get(voucherCode);
+
+      const res = await this.voucherService.applyVoucher(voucherCode);
+
+      if (!res) {
+        throw new HttpException('Voucher invalid', HttpStatus.BAD_REQUEST);
+      }
+      const discountPrice =
+        totalAmount * voucher.discount < voucher.maxDiscountPrice
+          ? totalAmount * voucher.discount
+          : voucher.maxDiscountPrice;
+
+      price = totalAmount - discountPrice;
+    }
 
     const order = {
       ...orderInfo,
@@ -120,7 +128,7 @@ export class OrderService {
       const updateStatus = paymentStatus.data.status;
 
       if (updateStatus === 'PAID') {
-        Object.assign(order, {...order, status: PaymentStatus.PAID})
+        Object.assign(order, { ...order, status: PaymentStatus.PAID });
         await order.save();
       }
     }
