@@ -32,4 +32,11 @@ export class VoucherController {
   async getActiveVouchers() {
     return this.voucherService.getActiveVouchers();
   }
+
+  @Public()
+  @Get(':id')
+  @ApiOperation({ summary: 'Get active vouchers' })
+  async getActiveVoucher(@Param('id') id: string) {
+    return this.voucherService.get(id);
+  }
 }

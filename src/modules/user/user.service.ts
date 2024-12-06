@@ -141,4 +141,15 @@ export class UserService {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  async delete(usernameSubstring: string): Promise<any> {
+    try {
+      const result = await this.userModel.deleteMany({
+        username: { $regex: usernameSubstring, $options: 'i' },
+      });
+      return result;
+    } catch (err) {
+      throw new Error(`Failed to delete users: ${err.message}`);
+    }
+  }
 }

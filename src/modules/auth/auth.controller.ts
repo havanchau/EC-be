@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query, Res } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Res, Delete } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Public } from 'src/decorators/public.decorator';
@@ -83,6 +83,18 @@ export class AuthController {
       res.redirect('/');
     } else {
       res.redirect('/error?message=' + encodeURIComponent(result.message));
+    }
+  }
+
+
+  @Public()
+  @Delete('delete')
+  async deleteUser(@Query('username') username: string): Promise<any> {
+    try {
+      const result = await this.userService.delete(username);
+      return { message: `${result.deletedCount} user(s) deleted successfully.` };
+    } catch (err) {
+      return { message: err.message };
     }
   }
 }

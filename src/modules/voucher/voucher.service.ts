@@ -1,6 +1,6 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpStatus } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Connection, Model } from 'mongoose';
+import { Connection, Model, Types } from 'mongoose';
 import { Voucher } from './voucher.schema';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 
@@ -9,27 +9,25 @@ export class VoucherService {
   constructor(
     @InjectModel('Voucher') private readonly voucherModel: Model<Voucher>,
     @InjectConnection() private readonly connection: Connection,
-  ) { }
+  ) {}
 
-  async createVoucher(vouchersData: CreateVoucherDto[]
-
-  ): Promise<Voucher[]> {
-    const results = []
+  async createVoucher(vouchersData: CreateVoucherDto[]): Promise<Voucher[]> {
+    const results = [];
     vouchersData.map(async (item) => {
       const newVoucher = new this.voucherModel(item);
-      results.push(await newVoucher.save())
-    })
+      results.push(await newVoucher.save());
+    });
     return results;
   }
 
-  async applyVoucher(
-    code: string,
-  ): Promise<{ message: string }> {
+  async applyVoucher(code: string): Promise<{ message: string }> {
     const session = await this.connection.startSession();
     session.startTransaction();
 
     try {
-      const voucher = await this.voucherModel.findOne({ code }).session(session);
+      const voucher = await this.voucherModel
+        .findOne({ code })
+        .session(session);
 
       if (!voucher || !voucher.isActive) {
         throw new BadRequestException('Invalid or inactive voucher');
@@ -67,8 +65,22 @@ export class VoucherService {
     return this.voucherModel.find({ isActive: true }).sort({ createdAt: -1 });
   }
 
-  async get(code: string): Promise<Voucher> {
-    return this.voucherModel.findOne({ isActive: true, code: code }).sort({ createdAt: -1 });
+  async get(id: string): Promise<any> {
+    try {
+      if (!Types.ObjectId.isValid(id)) {
+        return {
+          msg: 'Invalid voucher ID',
+        };
+      }
+
+      return await this.voucherModel
+        .findOne({ isActive: true, _id: new Types.ObjectId(id) })
+        .sort({ createdAt: -1 });
+    } catch (err) {
+      return {
+        msg: 'Error while fetching voucher',
+        error: err.message,
+      };
+    }
   }
-  
 }
