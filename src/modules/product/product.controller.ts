@@ -86,9 +86,12 @@ export class ProductController {
     @Query('minPrice') minPrice?: number,
     @Query('maxPrice') maxPrice?: number,
     @Query('brand') brand?: string,
-    @Query('rating') rating?: number,
     @Query('desc') desc?: string,
+    @Query('rating') rating?: number,
     @Query('benefit') benefit?: string,
+    @Query('pageSize') pageSize?: string,
+    @Query('page') page?: string,
+    @Query('random') random?: number,
   ): Promise<Product[]> {
     return this.productService.findAll({
       name,
@@ -99,6 +102,9 @@ export class ProductController {
       rating,
       desc,
       benefit,
+      pageSize,
+      page,
+      random,
     });
   }
 

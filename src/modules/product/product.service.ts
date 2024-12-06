@@ -13,7 +13,7 @@ export class ProductService {
     private readonly productModel: Model<ProductDocument>,
     private readonly imageService: ImageService,
     private readonly reviewService: ReviewService,
-  ) {}
+  ) { }
 
   async create(
     productData: Partial<Product>,
@@ -41,10 +41,15 @@ export class ProductService {
     desc?: string;
     benefit?: string;
     productIds?: string[];
-    page?: number;
-    pageSize?: number;
+    page?: string;
+    pageSize?: string;
+    random?: number;
   }): Promise<any> {
-    const { name, category, minPrice, maxPrice, brand, rating, desc, benefit, productIds, page = 1, pageSize = 20 } = query;
+    let { random, name, category, minPrice, maxPrice, brand, rating, desc, benefit, productIds, page = 1, pageSize = 20 } = query;
+
+    pageSize = parseInt(pageSize as string)
+
+    page = parseInt(page as string)
 
     const filter: any = {};
 
@@ -82,9 +87,19 @@ export class ProductService {
     const skip = (page - 1) * pageSize;
     const limit = pageSize;
 
-    const results = await this.productModel.find(filter).skip(skip)
-      .limit(limit)
-      .exec();
+    let results = null;
+
+    if (random != 0 && random) {
+      results = await this.productModel.aggregate([
+        { $match: filter },
+        { $sample: { size: pageSize } },
+      ]);
+    }
+    else {
+      results = await this.productModel.find(filter).skip(skip)
+        .limit(limit)
+        .exec();
+    }
 
     const totalCount = await this.productModel.countDocuments(filter).exec();
 
@@ -98,16 +113,16 @@ export class ProductService {
 
   async findOne(id: string): Promise<{ product: Product; feedbacks: Review[] }> {
     const product = await this.productModel.findById(id).exec();
-  
+
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-  
+
     const feedbacks = await this.reviewService.getReviewsByProduct(id);
-  
+
     return { product, feedbacks };
   }
-  
+
 
   async update(
     id: string,
@@ -125,7 +140,7 @@ export class ProductService {
 
     if (productData.images) {
       const oldProductData = (await this.findOne(id)).product;
-    
+
       productData.images = [...oldProductData.images, ...newImages];
     }
     const updatedProduct = await this.productModel
