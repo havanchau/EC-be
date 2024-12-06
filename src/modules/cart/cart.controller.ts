@@ -36,7 +36,7 @@ export class CartController {
   @ApiParam({ name: 'id', description: 'Cart ID' })
   @ApiResponse({ status: 200, description: 'Cart found.' })
   @ApiResponse({ status: 404, description: 'Cart not found.' })
-  @Get('details')
+  @Post('details')
   async getCartDetails(@Body('items') items: { productId: string; quantity: number }[]): Promise<any> {
     return this.cartService.getCartDetails(items);
   }
