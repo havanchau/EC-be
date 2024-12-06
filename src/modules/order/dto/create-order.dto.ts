@@ -94,13 +94,6 @@ export class CreateOrderDto {
   shippingAddress: ShippingAddressDto;
 
   @ApiProperty({
-    description: 'Delivery date',
-    example: '2024-11-28T01:35:02.85Z',
-  })
-  @IsDateString()
-  deliveryDate: string;
-
-  @ApiProperty({
     description: 'Voucher code',
     example: '123456789',
   })
