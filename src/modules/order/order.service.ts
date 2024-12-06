@@ -125,7 +125,7 @@ export class OrderService {
 
     if (status === PaymentStatus.PENDING && orderCode) {
       const paymentStatus = await this.paymentService.getPaymentInfo(orderCode);
-      const updateStatus = paymentStatus.data.status;
+      const updateStatus = paymentStatus?.status;
 
       if (updateStatus === 'PAID') {
         Object.assign(order, { ...order, status: PaymentStatus.PAID });
