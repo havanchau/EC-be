@@ -34,9 +34,9 @@ export class VoucherController {
   }
 
   @Public()
-  @Get(':id')
+  @Get(':code')
   @ApiOperation({ summary: 'Get active vouchers' })
-  async getActiveVoucher(@Param('id') id: string) {
-    return this.voucherService.get(id);
+  async getActiveVoucher(@Param('code') code: string) {
+    return this.voucherService.get(code);
   }
 }

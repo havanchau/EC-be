@@ -65,17 +65,13 @@ export class VoucherService {
     return this.voucherModel.find({ isActive: true }).sort({ createdAt: -1 });
   }
 
-  async get(id: string): Promise<any> {
+  async get(code: string): Promise<any> {
     try {
-      if (!Types.ObjectId.isValid(id)) {
-        return {
-          msg: 'Invalid voucher ID',
-        };
-      }
+      const filter: any = {};
 
-      return await this.voucherModel
-        .findOne({ isActive: true, _id: new Types.ObjectId(id) })
-        .sort({ createdAt: -1 });
+      filter.code = { $regex: code, $options: 'i' };
+      const results = await this.voucherModel.find(filter).exec();
+      return results;
     } catch (err) {
       return {
         msg: 'Error while fetching voucher',
