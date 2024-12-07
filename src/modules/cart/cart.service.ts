@@ -74,12 +74,15 @@ export class CartService {
 
 
     async getCartDetails(items: { productId: string; quantity: number }[]): Promise<any> {
+        if (!items) {
+            return { items: [] }
+        }
         const productIds = items.map((item) => item.productId);
     
         const products = await this.productService.findAll({ productIds });
     
         if (!products || !products.results || products.results.length === 0) {
-            throw new NotFoundException('No products found for the provided IDs.');
+            return { items: [] }
         }
     
         const productMap = new Map<string, { quantity: number }>();
